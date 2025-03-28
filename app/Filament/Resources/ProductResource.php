@@ -29,7 +29,19 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('name')->required(),
                 Forms\Components\Textarea::make('description')->required(),
                 Forms\Components\TextInput::make('price')->numeric()->required(),
-                Forms\Components\FileUpload::make('image')->image(),
+                Forms\Components\Group::make([
+                    Forms\Components\FileUpload::make('image')
+                        ->image()
+                        ->disk('public')
+                        ->directory('products')
+                        ->nullable(), // Supaya tidak wajib upload file
+                
+                    Forms\Components\TextInput::make('image_url')
+                        ->label('Image URL')
+                        ->url()
+                        ->placeholder('https://example.com/image.jpg')
+                        ->nullable(), // Supaya tidak wajib isi URL
+                ]),
                 Forms\Components\TextInput::make('stock')->numeric()->required(),
             ]);
     }
@@ -39,7 +51,9 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\ImageColumn::make('image'),
+                Tables\Columns\ImageColumn::make('image')
+                ->label('Image')
+                ->getStateUsing(fn ($record) => $record->image_url ?? asset('storage/products/' . $record->image)),
                 Tables\Columns\TextColumn::make('price'),
                 Tables\Columns\TextColumn::make('stock'),
             ])

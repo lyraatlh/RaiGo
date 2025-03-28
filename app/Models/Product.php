@@ -2,9 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    //
+    use HasFactory;
+
+    protected $fillable = [ 'id', 'name', 'description', 'price', 'image', 'stock', 'user_id']; // Tambahkan atribut yang diperlukan
+    
+        public function getImagePathAttribute()
+    {
+        return $this->image_url ?? asset('storage/products/' . $this->image);
+    }
 }
